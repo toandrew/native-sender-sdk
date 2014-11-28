@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include <error.h>
 
 #include <string>
 using namespace std;

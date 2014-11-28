@@ -2,7 +2,6 @@
 #define TIMER_H_
 
 #include <pthread.h>
-#include <error.h>
 #include <sys/time.h>
 
 #include <list>
