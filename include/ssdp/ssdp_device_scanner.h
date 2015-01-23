@@ -12,6 +12,7 @@
 #include "pattern.h"
 
 #include "logger.h"
+#include "parsed_datagram.h"
 
 #include <string>
 #include <list>

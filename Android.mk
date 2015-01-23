@@ -43,7 +43,6 @@ LOCAL_C_INCLUDES := \
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/service/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/ssdp/
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/ssdp/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/ssdp/utils/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/utils/
 

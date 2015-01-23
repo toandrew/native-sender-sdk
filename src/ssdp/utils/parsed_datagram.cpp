@@ -14,11 +14,11 @@ static void remove_space(string& str){
 ParsedDatagram::ParsedDatagram(DatagramPacket *packet) {
 	dp = packet;
 
-	string messages = packet->getData();
+	string messages = dp->getData();
 
 	string delim("\r\n");
 
-	fillMaps(messages, delim);
+    fillMaps(messages, delim);
 };
 
 ParsedDatagram::~ParsedDatagram() {

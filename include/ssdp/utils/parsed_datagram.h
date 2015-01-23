@@ -10,22 +10,22 @@
 using namespace std;
 
 class ParsedDatagram {
-public:
+private:
 	DatagramPacket *dp;
 	map<string, string> data;
 	string type;
+private:
+	int fillMaps(const string& s, const string& delim);
 public:
 	ParsedDatagram(DatagramPacket *packet);
 	virtual ~ParsedDatagram();
 
 	static string asciiUpper(string text);
 
-	map<string, string> getData();
+    map<string, string> getData();
 
 	string getType();
 
-private:
-	int fillMaps(const string& s, const string& delim);
 };
 
 #endif //PARSED_DATAGRAM_H_
