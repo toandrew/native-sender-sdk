@@ -2,10 +2,14 @@
 
 InetSocketAddress::InetSocketAddress(const char *host, int port) {
 	sprintf(mIpAddress,"%s", host);
+
+	mPort = port;
 }
 
 InetSocketAddress::InetSocketAddress(InetAddress *address, int port) {
+	sprintf(mIpAddress,"%s", address->getIpAddress());
 
+	mPort = port;
 }
 
 InetSocketAddress::~InetSocketAddress() {

@@ -7,7 +7,7 @@
 
 class Thread {
 public:
-	Thread(Runnable *runnable);
+	Thread(Runnable *runnable, void*data);
 	virtual ~Thread();
 
 	void start();
@@ -18,6 +18,7 @@ private:
 private:
 	pthread_t m_thread;
 	Runnable *mRunnable;
+	void *mData;
 };
 
 #endif //THREAD_H_

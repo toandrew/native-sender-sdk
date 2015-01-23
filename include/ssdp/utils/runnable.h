@@ -9,7 +9,7 @@ public:
 	Runnable(RunnbaleCallback *callback);
 	virtual ~Runnable();
 
-	void run();
+	void run(void *param);
 private:
 	RunnbaleCallback *mCallback;
 };

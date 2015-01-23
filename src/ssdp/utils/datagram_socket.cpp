@@ -1,6 +1,25 @@
 #include "datagram_socket.h"
+#include <regex.h>
+#include <vector>
 
 #define SO_REUSEPORT 15 // need  change it
+
+#define SSDP_RESPONSE_HEADER "^HTTP\/[0-9]\.[0-9] [0-9][0-9][0-9] OK$"
+
+
+static void split(const string& s, const string& delim, vector<string> &ret) {
+	size_t last = 0;
+	size_t index = s.find_first_of(delim, last);
+	while (index != std::string::npos) {
+		ret.push_back(s.substr(last, index-last));
+		last = index + 1; 
+		index = s.find_first_of(delim, last);
+	}
+
+	if (index-last > 0) {
+		ret.push_back(s.substr(last, index - last));
+	}
+}
 
 DatagramSocket::DatagramSocket() {
 	mIsConnected = false;
@@ -20,10 +39,15 @@ void DatagramSocket::setReuseAddress(bool reuse) {
 void DatagramSocket::bind(InetSocketAddress *address) {
 	int ret = 0;
 
+	mSrcaddr.sin_family = PF_INET;
+	mSrcaddr.sin_addr.s_addr = inet_addr(address->getIpAddress());
+	mSrcaddr.sin_port = htons(address->getPort());
+
+    printf("DatagramSocket::bind![%s][%d]\n", address->getIpAddress(), address->getPort());
     // Bind to all interface(s)
     ret = ::bind(mSocket, (struct sockaddr*)&mSrcaddr, sizeof(struct sockaddr));
     if (ret < 0 ) {
-    	LOGE("address in use!");
+    	LOGE("sorry!address in use!close socket!");
 
     	::close(mSocket);
     	return;
@@ -40,6 +64,11 @@ void DatagramSocket::send(DatagramPacket *dp) {
 		createSocket();
 	}
 
+	InetSocketAddress *address = dp->getAddress();
+	mDstaddr.sin_family = PF_INET;
+	mDstaddr.sin_addr.s_addr = inet_addr(address->getIpAddress());
+	mDstaddr.sin_port = htons(address->getPort());
+
 	string str = dp->getData();
 	/*
     str.seekp(0, ios::end);
@@ -47,7 +76,8 @@ void DatagramSocket::send(DatagramPacket *dp) {
     str.seekp(0, ios::beg);
 	*/
 	if(mSocket != -1) {
-        sendto(mSocket, str.c_str(), str.length(), 0, (struct sockaddr*)&mSrcaddr , sizeof(struct sockaddr));
+		LOGE("DatagramSocket send: send it!");
+        ::sendto(mSocket, str.c_str(), str.length(), 0, (struct sockaddr*)&mDstaddr , sizeof(struct sockaddr));
 	} else {
         LOGE("invalid socket!");
     }
@@ -59,7 +89,7 @@ void DatagramSocket::receive(DatagramPacket *dp) {
 	}
 
 	int ret = 0;
-    unsigned char buf[4096] = {0};
+    char buf[4096] = {0};
     int bufsize = 4096;
     struct sockaddr_in sender;
     socklen_t senderlen = sizeof(struct sockaddr);
@@ -67,9 +97,33 @@ void DatagramSocket::receive(DatagramPacket *dp) {
     ret = recvfrom(mSocket, buf, bufsize, 0, (struct sockaddr*)&sender, &senderlen);
     if(ret != -1){
     	dp->setData(buf, ret);
+
+    	buf[ret] = '\0';
     }
 
-    LOGE("RECEIVED!!!!");
+	vector<string> vt;
+	string delim("\r\n");
+	split(dp->getData(), delim, vt);
+
+    printf("RECEIVED!!!![%d][%d][%s][%s]\n", ret, vt.size(), vt[0].c_str(), buf);
+
+     int nErrCode = 0;
+     regex_t oRegex;
+     if ((nErrCode = regcomp(&oRegex, SSDP_RESPONSE_HEADER, 0)) == 0) {
+     	if ((nErrCode = regexec(&oRegex, vt[0].c_str(), 0, NULL, 0)) == 0) {
+     		printf("%s matches %s\n", SSDP_RESPONSE_HEADER, vt[0].c_str());
+     		regfree(&oRegex);
+     		return;
+     	}
+     }
+
+     char szErrMsg[1024] = {0};
+     size_t unErrMsgLen = 0;
+     unErrMsgLen = regerror(nErrCode, &oRegex, szErrMsg, sizeof(szErrMsg));
+     unErrMsgLen = unErrMsgLen < sizeof(szErrMsg) ? unErrMsgLen : sizeof(szErrMsg) - 1;
+     szErrMsg[unErrMsgLen] = '\0';
+     printf("ErrMsg: %s\n", szErrMsg);
+     regfree(&oRegex);
 }
 
 bool DatagramSocket::isConnected() {
@@ -109,6 +163,8 @@ int DatagramSocket::createSocket() {
 		mSocket = -1;
 		return -1;
 	}
+
+	/*
 	ret = fcntl(mSocket, F_SETFL, optval | O_NONBLOCK);
 	if (ret < 0) {
 		LOGE("cannot fcntl[F_SETFL] socket!");
@@ -117,6 +173,7 @@ int DatagramSocket::createSocket() {
 		mSocket = -1;
 		return -1;
 	}
+	*/
 
     //Reuse port
     optval = 1;

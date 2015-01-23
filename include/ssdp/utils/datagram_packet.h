@@ -9,13 +9,16 @@ using namespace std;
 class DatagramPacket {
 private:
 	string data;
+	InetSocketAddress *mAddress;
 public:
-	DatagramPacket(unsigned char *buf, int length);
+	DatagramPacket(const char *buf, int length);
 	DatagramPacket(const char *buf, int length, InetSocketAddress *address);
 	virtual ~DatagramPacket();
 
 	string getData();
-	void setData(unsigned char *buf, int length);
+	void setData(char *buf, int length);
+
+	InetSocketAddress *getAddress();
 };
 
 #endif //DATAGRAM_PACKET_H_

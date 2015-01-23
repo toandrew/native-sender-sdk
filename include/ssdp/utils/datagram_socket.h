@@ -24,7 +24,7 @@ protected:
 	int mSocket;
 	
 	struct sockaddr_in mSrcaddr;
-
+	struct sockaddr_in mDstaddr;
 public:
 	DatagramSocket();
 	virtual ~DatagramSocket();

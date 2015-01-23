@@ -19,6 +19,18 @@ void MulticastSocket::joinGroup(InetSocketAddress *address, NetworkInterface *ne
 		return;
 	} 
 
+/*
+    int optval = 0;
+    ret = setsockopt(mSocket, IPPROTO_IP, IP_MULTICAST_LOOP, (char*)&optval, sizeof(int));
+    if (ret < 0) {
+      LOGE("FAILED TO IP_ADD_MEMBERSHIP!");
+
+      ::close(mSocket);
+      return;
+    }
+
+*/
+
     // Add membership
     mMreq.imr_multiaddr.s_addr = inet_addr(address->getIpAddress());
     mMreq.imr_interface.s_addr = htonl(INADDR_ANY);
@@ -30,7 +42,13 @@ void MulticastSocket::joinGroup(InetSocketAddress *address, NetworkInterface *ne
    		return;
    	}
 
-   	bind(address);
+    ///InetSocketAddress *ad = new InetSocketAddress("0.0.0.0", 0); 
+
+    LOGE("MulticastSocket::joinGroup:READY TO BIND?!");
+   	//bind(address);
+
+    //delete ad;
+    //ad = NULL;
 }
 
 void MulticastSocket::leaveGroup(InetSocketAddress *address, NetworkInterface *netIf) {

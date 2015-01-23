@@ -31,7 +31,7 @@ private:
 	const static int NUM_OF_THREADS 		= 20;
 	const static int RESCAN_INTERVAL 		= 10; //10s
 
-	map<string, ScannerPrivData> *mScannerData;
+	map<string, ScannerPrivData> mScannerData;
 
 	SSDPSocket *mSSDPSocket;
 	SSDPSearchMsg *mSSDPSearchMsg;
@@ -41,9 +41,9 @@ private:
 
 	Pattern *uuidReg;
 
-	list<string> *mDiscoveredDeviceList;
+	list<string> mDiscoveredDeviceList;
 
-	map<string, string> *mFoundDeviceMap;
+	map<string, string> mFoundDeviceMap;
 
 	Timer *mCheckOfflineTimer;
 

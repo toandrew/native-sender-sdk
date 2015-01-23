@@ -7,6 +7,51 @@
 
 SsdpService *gSsdpService;
 
+int ssdp_discovery()
+{
+    struct sockaddr_in   addrin     ;
+    struct timeval       rtime      ;
+    int                  newsock    ;
+    int                  ret        ;
+    char                 buf[1024]  ;
+    int                  i=0        ;
+    int                  yes=1      ;
+
+    rtime.tv_sec  = 2 ;
+    rtime.tv_usec = 0 ;
+
+    bzero(&addrin, sizeof(addrin));
+    addrin.sin_family = AF_INET;
+    addrin.sin_addr.s_addr = inet_addr("239.255.255.250"); //htonl(INADDR_ANY)
+    addrin.sin_port = htons(1900);
+
+    newsock=socket(AF_INET,SOCK_DGRAM,0);
+    if( newsock < 0) {perror("1"); return -1;}
+
+    setsockopt( newsock, SOL_SOCKET, SO_RCVTIMEO, (const char *)&rtime, sizeof(struct timeval));
+    setsockopt( newsock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) ;
+
+    ret=bind( newsock, (struct sockaddr *)&addrin, sizeof(addrin));
+    if( ret < 0 )   {perror("2"); return -1;}
+
+    while(i<8)
+    {
+        i++;
+        yes=sizeof(struct sockaddr_in);
+
+        memset(buf, 0, sizeof(buf));
+        ret=recvfrom( newsock, &buf,sizeof(buf), 0, (struct sockaddr *)&addrin, &yes);
+        if( ret < 0 ) {perror("3"); continue;}
+        printf("ip:%s\n",inet_ntoa( addrin.sin_addr));
+        printf("%s\n",buf);
+      
+
+    }
+
+    close(newsock);
+    return 0;
+}
+
 void exit_handler(int sig) {
     LOGI("exit_handler[%d]", sig);
 
@@ -22,6 +67,7 @@ void exit_handler(int sig) {
 void *enter_mainLoop(void *args) {
 	int stoploop = 0;
 	while (!stoploop) {
+//ssdp_discovery();
 		sleep(1);
 	}
 	LOGI("");

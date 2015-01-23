@@ -38,3 +38,5 @@ proguard-project.txt
 
 # MAC cacha file
 .DS_Store
+
+src/.depend

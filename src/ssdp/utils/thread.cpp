@@ -1,8 +1,9 @@
 #include "thread.h"
 #include "logger.h"
 
-Thread::Thread(Runnable *runnable) {
+Thread::Thread(Runnable *runnable, void* data) {
 	mRunnable = runnable;
+	mData = data;
 }
 
 Thread::~Thread() {
@@ -43,7 +44,15 @@ void Thread::interrupt() {
 void* Thread::ExecuteFunc(void* data) {
 	Thread *thread = (Thread *)data;
 	if (thread && thread->mRunnable) {
-		thread->mRunnable->run();
+		if (thread->mData == NULL) {
+			LOGE("thread->mData is NULL!");
+		} else {
+			LOGE("thread->mData is NOT NULL!");
+		}
+
+		thread->mRunnable->run(thread->mData);
 	}
+
+    return NULL;
 }
 

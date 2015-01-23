@@ -8,15 +8,17 @@ SSDPSocket::SSDPSocket(InetAddress *address) : mTimeout(0) {
 
 	mSSDPMulticastGroup = new InetSocketAddress(ADDRESS, PORT);
 
+    LOGE("CREATE Multicast SOCKET!");
 	mMuticastSocket = new MulticastSocket(PORT);
 
 	mNetIf = NetworkInterface::getByInetAddress(mInetAddress);
 
 	mMuticastSocket->joinGroup(mSSDPMulticastGroup, mNetIf);
 
+    LOGE("CREATE Wild SOCKET!");
     mWildSocket = new DatagramSocket();
     mWildSocket->setReuseAddress(true);
-    mWildSocket->bind(new InetSocketAddress(mInetAddress, SOURCE_PORT));
+    mWildSocket->bind(new InetSocketAddress("0.0.0.0", PORT));
 }
 
 SSDPSocket::~SSDPSocket() {
@@ -40,10 +42,13 @@ void SSDPSocket::send(string data) {
                 mSSDPMulticastGroup);
 
     mWildSocket->send(dp);
+
+    delete dp;
+    dp = NULL;
 }
 
 DatagramPacket *SSDPSocket::responseReceive() {
-	byte* buf = new byte[1024];
+	char* buf = new char[1024];
     DatagramPacket *dp = new DatagramPacket(buf, 1024);
 
     mWildSocket->receive(dp);
@@ -52,7 +57,7 @@ DatagramPacket *SSDPSocket::responseReceive() {
 }
 
 DatagramPacket *SSDPSocket::notifyReceive() {
-	byte* buf = new byte[1024];
+	char* buf = new char[1024];
     DatagramPacket *dp = new DatagramPacket(buf, 1024);
 
     mMuticastSocket->receive(dp);

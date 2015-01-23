@@ -9,9 +9,9 @@ Runnable::~Runnable() {
 
 }
 
-void Runnable::run() {
+void Runnable::run(void *param) {
 	LOGE("Runnable::run!");
 	if (mCallback != NULL) {
-		mCallback(NULL);
+		mCallback(param);
 	} 
 }
