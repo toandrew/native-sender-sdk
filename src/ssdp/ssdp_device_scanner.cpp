@@ -1,8 +1,10 @@
 #include "ssdp_device_scanner.h"
 #include <regex.h>
 
-//#define SSDP_RESPONSE_USNKEY_UUID_PATTERN "(?<=uuid:)(.+?)(?=(::)|$)"
+#define MAX_NUM_OF_THREADS 20
+
 #define SSDP_RESPONSE_USNKEY_UUID_PATTERN "uuid:(.+)(::.+)"
+
 SsdpDeviceScanner::SsdpDeviceScanner() :mStarting(false) {
 	LOGI("SsdpDeviceScanner!");
 }
@@ -103,6 +105,7 @@ void SsdpDeviceScanner::stop() {
     	delete mSSDPSocket;
     	mSSDPSocket = NULL;
     }
+
 }
 
 void SsdpDeviceScanner::openSocket() {
@@ -214,7 +217,7 @@ void SsdpDeviceScanner::handleDatagramPacket(ParsedDatagram *pd) {
 }
 
 void SsdpDeviceScanner::getLocationData(string location, string uuid) {
-
+	printf("getLocationData![%s][%s]\n", location.c_str(), uuid.c_str());
 }
 
 void SsdpDeviceScanner::onResult(string uuid, LocationDevice *device) {
@@ -281,6 +284,11 @@ void* SsdpDeviceScanner::handleResponseNotify(void *data) {
 		if (scanner->mSSDPSocket != NULL) {
 			dp = scanner->mSSDPSocket->notifyReceive();
 			LOGE("RECEIVED NOTIFY!");
+			if (dp != NULL) {
+				LOGE("RECEIVED RESPONSE!");
+
+				scanner->handleDatagramPacket(new ParsedDatagram(dp));
+			}
 		}
 	}
 	

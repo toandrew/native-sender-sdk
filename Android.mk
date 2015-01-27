@@ -1,7 +1,7 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_PREBUILT_LIBS := libsupc++:libs/libsupc++.a
+LOCAL_PREBUILT_LIBS := libsupc++:libs/libsupc++.a libcurl:libs/libcurl.a
 include $(BUILD_MULTI_PREBUILT)
 include $(CLEAR_VARS)
 
@@ -29,7 +29,8 @@ LOCAL_SRC_FILES := \
         src/ssdp/utils/socket_address.cpp \
         src/ssdp/utils/thread.cpp \
         src/ssdp/utils/timer.cpp \
-        src/utils/logger.cpp
+        src/utils/logger.cpp \
+        src/http/http_client.cpp \
 
 #LOCAL_CPPFLAGS += -Wno-format -DHAVE_CONFIG_H  -D_THREAD_SAFE -DDEBUG -O0 -g
 LOCAL_CFLAGS := -DHAVE_CONFIG_H -DANDROID -DEXPAT_RELATIVE_PATH -DALLOW_QUOTED_COOKIE_VALUES -DCOMPONENT_BUILD -DGURL_DLL
@@ -45,6 +46,8 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/service/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/ssdp/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/ssdp/utils/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/utils/
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/http/
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/http/include
 
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
@@ -52,7 +55,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libstlport
 
 
-LOCAL_STATIC_LIBRARIES := libsupc++
+LOCAL_STATIC_LIBRARIES := libsupc++ libcurl
 
 LOCAL_MODULE_TAGS := option
 
