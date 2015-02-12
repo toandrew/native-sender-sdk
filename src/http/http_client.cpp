@@ -3,7 +3,7 @@
 #include <string>
 
 CHttpClient::CHttpClient(void) : 
-m_bDebug(false)
+m_bDebug(true)
 {
 
 }
@@ -92,6 +92,8 @@ int CHttpClient::Get(const std::string & strUrl, std::string & strResponse)
 		curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, OnDebug);
 	}
 
+	curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
+	
 	curl_easy_setopt(curl, CURLOPT_READFUNCTION, NULL);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, OnWriteData);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&strResponse);

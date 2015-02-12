@@ -14,6 +14,8 @@
 #include "logger.h"
 #include "parsed_datagram.h"
 
+#include "http_client.h"
+
 #include <string>
 #include <list>
 #include <map>
@@ -55,6 +57,10 @@ private:
 	Runnable *mResponseHandler;
 
 	Runnable *mRespNotifyHandler;
+
+	LocationDevice *mLocationDevice;
+
+	CHttpClient *mHttpClient;
 
 public:
 	SsdpDeviceScanner();

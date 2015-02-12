@@ -218,6 +218,19 @@ void SsdpDeviceScanner::handleDatagramPacket(ParsedDatagram *pd) {
 
 void SsdpDeviceScanner::getLocationData(string location, string uuid) {
 	printf("getLocationData![%s][%s]\n", location.c_str(), uuid.c_str());
+
+	if (mLocationDevice == NULL) {
+		mLocationDevice = new LocationDevice();
+	}
+
+	if (mHttpClient == NULL) {
+		mHttpClient = new CHttpClient();
+	}
+
+	string response;
+
+	mHttpClient->Get(location, response);
+	printf("getLocationData and response:[%s]\n", response.c_str());
 }
 
 void SsdpDeviceScanner::onResult(string uuid, LocationDevice *device) {

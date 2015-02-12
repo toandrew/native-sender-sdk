@@ -52,14 +52,15 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/http/include
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	libutils \
-	libstlport
+	libstlport\
+	libz
 
 
 LOCAL_STATIC_LIBRARIES := libsupc++ libcurl
 
 LOCAL_MODULE_TAGS := option
 
-LOCAL_LDLIBS += -L$(SYSROOT)/usr/lib -llog
+LOCAL_LDLIBS += -L$(SYSROOT)/usr/lib -llog -lz
 
 LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
 

@@ -13,11 +13,11 @@ TARGET=flint-sdk
 
 DEP=depend
 
-CORE_FILES = $(wildcard *.cpp ./ssdp/*.cpp ./utils/*.cpp ./service/*.cpp ./ssdp/utils/*)
+CORE_FILES = $(wildcard *.cpp ./ssdp/*.cpp ./utils/*.cpp ./service/*.cpp ./ssdp/utils/* ./http/*.cpp)
 
 CORE_OBJS = $(subst .cpp,.o,$(CORE_FILES))
 
-INCLUDE = -I../include/ -I../include/ssdp/ -I../include/service -I../include/utils -I../include/ssdp/utils
+INCLUDE = -I../include/ -I../include/ssdp/ -I../include/service -I../include/utils -I../include/ssdp/utils -I./http -I./http/include
 LIBS= -lpthread
 
 # Targets start here.
