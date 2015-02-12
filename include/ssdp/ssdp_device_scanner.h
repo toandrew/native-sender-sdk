@@ -100,6 +100,7 @@ private:
 
 
 class ScannerPrivData {
+public:
 	FlingDevice *mFlingDevice;
     long mElapsedRealtime;
     long mTTl;
@@ -108,6 +109,7 @@ class ScannerPrivData {
 };
 
 class LocationDevice {
+public:
 	list<LocationImage> *iconImages;
     string url;
     string friendlyName;
@@ -116,6 +118,7 @@ class LocationDevice {
 };
 
 class LocationImage {
+public:
 	string mimetype;
     string width;
     string height;

@@ -1,6 +1,10 @@
 #include "ssdp_device_scanner.h"
 #include <regex.h>
 
+#include "tinyxml2.h"
+
+using namespace tinyxml2; 
+
 #define MAX_NUM_OF_THREADS 20
 
 #define SSDP_RESPONSE_USNKEY_UUID_PATTERN "uuid:(.+)(::.+)"
@@ -231,10 +235,47 @@ void SsdpDeviceScanner::getLocationData(string location, string uuid) {
 
 	mHttpClient->Get(location, response);
 	printf("getLocationData and response:[%s]\n", response.c_str());
+
+	XMLDocument doc;
+	doc.Parse(response.c_str());
+
+	XMLElement *root = doc.RootElement();
+	XMLElement *URLBase = root->FirstChildElement("URLBase");
+	if (URLBase != NULL) {
+		mLocationDevice->url = URLBase->GetText();
+		printf( "URLBase[%s]\n", URLBase->GetText());
+	}
+
+	XMLElement *device = root->FirstChildElement("device");
+	if (device != NULL) {
+		XMLElement *friendlyName = device->FirstChildElement("friendlyName");
+		if (friendlyName) {
+			mLocationDevice->friendlyName = friendlyName->GetText();
+			printf("friendlyName![%s]\n", mLocationDevice->friendlyName.c_str());
+		}
+		
+		XMLElement *manufacturer = device->FirstChildElement("manufacturer");
+		if (manufacturer) {
+			mLocationDevice->manufacturer = manufacturer->GetText();
+			printf("manufacturer![%s]\n", mLocationDevice->manufacturer.c_str());
+		}
+		
+		XMLElement *modelName = device->FirstChildElement("modelName");
+		if (modelName) {
+			mLocationDevice->modelName = modelName->GetText();
+			printf("modelName![%s]\n", mLocationDevice->modelName.c_str());
+		}
+
+		onResult(uuid, mLocationDevice);
+	}
+
+	// ignore icons
+
+
 }
 
 void SsdpDeviceScanner::onResult(string uuid, LocationDevice *device) {
-
+	printf("onResult![%s]\n", uuid.c_str());
 }
 
 void *SsdpDeviceScanner::checkDeviceOffline(void *data) {

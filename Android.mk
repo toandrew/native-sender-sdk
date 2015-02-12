@@ -31,10 +31,11 @@ LOCAL_SRC_FILES := \
         src/ssdp/utils/timer.cpp \
         src/utils/logger.cpp \
         src/http/http_client.cpp \
+		src/tinyxml2/tinyxml2.cpp \
 
 #LOCAL_CPPFLAGS += -Wno-format -DHAVE_CONFIG_H  -D_THREAD_SAFE -DDEBUG -O0 -g
-LOCAL_CFLAGS := -DHAVE_CONFIG_H -DANDROID -DEXPAT_RELATIVE_PATH -DALLOW_QUOTED_COOKIE_VALUES -DCOMPONENT_BUILD -DGURL_DLL
-LOCAL_CPPFLAGS += -fexceptions  -fno-rtti
+LOCAL_CFLAGS := -DHAVE_CONFIG_H -DANDROID -DEXPAT_RELATIVE_PATH -DALLOW_QUOTED_COOKIE_VALUES -DCOMPONENT_BUILD -DGURL_DLL -DANDROID_NDK
+LOCAL_CPPFLAGS += -fexceptions  -fno-rtti -DANDROID_NDK
 
 LOCAL_C_INCLUDES := \
 	frameworks/base/include \
@@ -47,12 +48,13 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/ssdp/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/ssdp/utils/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/utils/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/http/
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/http/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/http/include/
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/tinyxml2/
 
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	libutils \
-	libstlport\
+	libstlport \
 	libz
 
 
@@ -60,7 +62,7 @@ LOCAL_STATIC_LIBRARIES := libsupc++ libcurl
 
 LOCAL_MODULE_TAGS := option
 
-LOCAL_LDLIBS += -L$(SYSROOT)/usr/lib -llog -lz
+LOCAL_LDLIBS += -L$(SYSROOT)/usr/lib -llog
 
 LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
 

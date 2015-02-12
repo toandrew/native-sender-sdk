@@ -3,7 +3,7 @@
 #include <string>
 
 CHttpClient::CHttpClient(void) : 
-m_bDebug(true)
+m_bDebug(false)
 {
 
 }
