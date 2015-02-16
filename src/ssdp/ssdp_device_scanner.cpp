@@ -33,6 +33,21 @@ void SsdpDeviceScanner::stopScanInternal() {
 }
 
 void SsdpDeviceScanner::setDeviceOffline(string id) {
+	FlintDevice *device = NULL;
+    
+    map<string, ScannerPrivData>::iterator iter;
+    iter = mScannerData.find(id);
+	if(iter != mScannerData.end()) {
+		ScannerPrivData data = (*iter).second;
+    	data.mScannedTime = 0;//SystemClock.elapsedRealtime(); // TODO
+        data.mIsOffline = true;
+        device = data.mFlintDevice;
+        if (device != NULL) {
+        	notifyDeviceOffline(device);
+            mFoundDeviceMap.erase(data.mUuid);
+            mScannerData.erase(id);
+        }
+    }
 }
 
 void SsdpDeviceScanner::onAllDevicesOffline() {
@@ -239,11 +254,15 @@ void SsdpDeviceScanner::getLocationData(string location, string uuid) {
 	XMLDocument doc;
 	doc.Parse(response.c_str());
 
+    bool ok = true;
+
 	XMLElement *root = doc.RootElement();
 	XMLElement *URLBase = root->FirstChildElement("URLBase");
 	if (URLBase != NULL) {
 		mLocationDevice->url = URLBase->GetText();
 		printf( "URLBase[%s]\n", URLBase->GetText());
+	} else {
+		ok = false;
 	}
 
 	XMLElement *device = root->FirstChildElement("device");
@@ -252,30 +271,123 @@ void SsdpDeviceScanner::getLocationData(string location, string uuid) {
 		if (friendlyName) {
 			mLocationDevice->friendlyName = friendlyName->GetText();
 			printf("friendlyName![%s]\n", mLocationDevice->friendlyName.c_str());
+		} else {
+			ok = false;
 		}
 		
 		XMLElement *manufacturer = device->FirstChildElement("manufacturer");
 		if (manufacturer) {
 			mLocationDevice->manufacturer = manufacturer->GetText();
 			printf("manufacturer![%s]\n", mLocationDevice->manufacturer.c_str());
+		} else {
+			ok = false;
 		}
 		
 		XMLElement *modelName = device->FirstChildElement("modelName");
 		if (modelName) {
 			mLocationDevice->modelName = modelName->GetText();
 			printf("modelName![%s]\n", mLocationDevice->modelName.c_str());
+		} else {
+			ok = false;
 		}
 
-		onResult(uuid, mLocationDevice);
+		// ignore icons
 	}
 
-	// ignore icons
+	if (ok) {
+		onResult(uuid, mLocationDevice);
+	} else {
+		mDiscoveredDeviceList.remove(uuid);
+	}
 
 
 }
 
 void SsdpDeviceScanner::onResult(string uuid, LocationDevice *device) {
-	printf("onResult![%s]\n", uuid.c_str());
+	printf("ENTER onResult![%s]\n", uuid.c_str());
+
+	if (device == NULL || device->manufacturer != "openflint") {
+		return;
+	}
+
+	string deviceId = device->friendlyName;
+	if (!deviceId.empty()) {
+		if (device->url.empty()) {
+			mScannerData.erase(deviceId);
+			mDiscoveredDeviceList.remove(uuid);
+
+			return;
+		}
+
+		int position = device->url.rfind(':');
+		string ip = device->url.substr(string("http://").length(), position - string("http://").length());
+        string port = device->url.substr(position + 1);
+
+        FlintDevice *flintDevice = new FlintDevice();
+
+        flintDevice->setDeviceId(deviceId + ip);
+        flintDevice->setAddress(ip);
+        flintDevice->setFriendlyName(device->friendlyName);
+        flintDevice->setModelName(device->modelName);
+        flintDevice->setDeviceVersion("02");
+        flintDevice->setServicePort(port);
+        flintDevice->setIconList(); // TODO
+        flintDevice->setFoundSource(FOUND_SOURCE_SSDP);
+
+        printf("ip:[%s], port[%s]\n", ip.c_str(), port.c_str());
+
+        map<string, ScannerPrivData>::iterator iter;
+        iter = mScannerData.find(deviceId);
+	    if(iter != mScannerData.end()) {
+		    ScannerPrivData data = (*iter).second;
+        	if (flintDevice == data.mFlintDevice) {
+        		if (!data.mIsOffline) {
+        			// TODO
+        		}
+
+        		mDiscoveredDeviceList.remove(uuid);
+        		return;
+        	} else {
+				mScannerData.erase(deviceId);
+        	}
+        }
+
+        ScannerPrivData privData(flintDevice, 10L, uuid);
+
+        mScannerData.insert(pair<string, ScannerPrivData>(deviceId, privData));
+        mFoundDeviceMap.insert(pair<string, string>(uuid, deviceId));
+        mDiscoveredDeviceList.remove(uuid);
+
+        // TODO
+        /*
+        if (data != NULL
+        	&& data.mFlintDevice != NULL
+        	&& data.mFlintDevice.getFoundSource().equals(FlintDevice.FOUND_SOURCE_SSDP)) {
+        	notifyDeviceOffline(data.mFlintDevice);
+        }
+		*/
+
+        list<IDeviceScanListener> *listenerList = getDeviceScannerListenerList();
+        if (listenerList == NULL) {
+        	return;
+        }
+
+        for (list<IDeviceScanListener>::iterator listener = listenerList->begin(); listener != listenerList->end(); listener++) {
+        	(*listener).onDeviceOnline(flintDevice);
+        }
+
+       	/*
+        mHandler.post(new Runnable() {
+        	public void run() {
+            	for (IDeviceScanListener listener : listenerList)
+                	listener.onDeviceOnline(flintDevice);
+            }
+        });
+        */
+	}
+
+	printf("QUIT onResult!\n");
+
 }
 
 void *SsdpDeviceScanner::checkDeviceOffline(void *data) {
@@ -350,3 +462,24 @@ void* SsdpDeviceScanner::handleResponseNotify(void *data) {
 
 	return NULL;
 }
+
+ScannerPrivData::ScannerPrivData(FlintDevice *device, long ttl, string uuid) {
+	mFlintDevice = device;
+	mTTl = ttl;
+	mUuid = uuid;
+}
+
+ScannerPrivData::ScannerPrivData(const ScannerPrivData &data) {
+	mFlintDevice = data.mFlintDevice;
+	mTTl = data.mTTl;
+	mScannedTime = data.mScannedTime;
+    mIsOffline = data.mIsOffline;
+    mUuid = data.mUuid;
+}
+
+ScannerPrivData::~ScannerPrivData() {
+	
+}
+
+
+

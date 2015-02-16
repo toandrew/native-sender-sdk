@@ -14,6 +14,8 @@
 #include "logger.h"
 #include "parsed_datagram.h"
 
+#include "flint_device.h"
+
 #include "http_client.h"
 
 #include <string>
@@ -101,10 +103,14 @@ private:
 
 class ScannerPrivData {
 public:
-	FlingDevice *mFlingDevice;
-    long mElapsedRealtime;
+	ScannerPrivData(FlintDevice *device, long ttl, string uuid);
+	ScannerPrivData(const ScannerPrivData &data);
+	virtual ~ScannerPrivData();
+public:
+	FlintDevice *mFlintDevice;
+    long mScannedTime;
     long mTTl;
-    bool d;
+    bool mIsOffline;
     string mUuid;
 };
 

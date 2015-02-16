@@ -26,12 +26,12 @@ void DeviceScanner::addListener(IDeviceScanListener *listener) {
 
 }
 
-void DeviceScanner::notifyDeviceOffline(FlingDevice *device) {
+void DeviceScanner::notifyDeviceOffline(FlintDevice *device) {
 
 }
 
 list<IDeviceScanListener> *DeviceScanner::getDeviceScannerListenerList() {
-	return NULL;
+	return &mListenerList;
 }
 
 void DeviceScanner::reportNetworkError() {

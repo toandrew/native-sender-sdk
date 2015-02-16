@@ -17,7 +17,7 @@ CORE_FILES = $(wildcard *.cpp ./ssdp/*.cpp ./utils/*.cpp ./service/*.cpp ./ssdp/
 
 CORE_OBJS = $(subst .cpp,.o,$(CORE_FILES))
 
-INCLUDE = -I../include/ -I../include/ssdp/ -I../include/service -I../include/utils -I../include/ssdp/utils -I./http -I./http/include
+INCLUDE = -I../include/ -I../include/ssdp/ -I../include/service -I../include/utils -I../include/ssdp/utils -I./http -I./http/include -I../include/flint/
 LIBS= -lpthread
 
 # Targets start here.

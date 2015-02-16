@@ -11,7 +11,6 @@ LOCAL_SRC_FILES := \
         src/main.cpp \
         src/service/ssdp_service.cpp \
         src/ssdp/device_scanner.cpp \
-        src/ssdp/fling_device.cpp \
         src/ssdp/ssdp.cpp \
         src/ssdp/ssdp_device_scanner.cpp \
         src/ssdp/ssdp_search_msg.cpp \
@@ -32,6 +31,7 @@ LOCAL_SRC_FILES := \
         src/utils/logger.cpp \
         src/http/http_client.cpp \
 		src/tinyxml2/tinyxml2.cpp \
+		src/flint/flint_device.cpp \
 
 #LOCAL_CPPFLAGS += -Wno-format -DHAVE_CONFIG_H  -D_THREAD_SAFE -DDEBUG -O0 -g
 LOCAL_CFLAGS := -DHAVE_CONFIG_H -DANDROID -DEXPAT_RELATIVE_PATH -DALLOW_QUOTED_COOKIE_VALUES -DCOMPONENT_BUILD -DGURL_DLL -DANDROID_NDK
@@ -50,6 +50,7 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/utils/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/http/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/http/include/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/tinyxml2/
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/include/flint/
 
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
